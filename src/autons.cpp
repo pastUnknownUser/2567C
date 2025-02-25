@@ -1,7 +1,7 @@
 #include "EZ-Template/util.hpp"
 #include "liblvgl/core/lv_obj_class.h" // IWYU pragma: keep
 #include "main.h" // IWYU pragma: keep
-#include "pros/abstract_motor.hpp"
+#include "pros/abstract_motor.hpp" // IWYU pragma: keep
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
 #include "subsystems.hpp"
@@ -50,28 +50,28 @@ void turnUntil(float heading, int speed, float untilAngle, int untilSpeed) {
 }
 
 void runIntake(float voltage) {
-  intake.move_voltage(voltage); // intake out
-  intake2.move_voltage(-voltage);
+  //intake.move_voltage(voltage); // intake out
+  //intake2.move_voltage(-voltage);
 }
 
 void revRunIntake(float voltage) {
-  intake.move_voltage(-voltage); // intake out
-  intake2.move_voltage(voltage);
+  //intake.move_voltage(-voltage); // intake out
+  //intake2.move_voltage(voltage);
 }
 
 void stopIntake() {
-  intake.move_voltage(0);
-  intake2.move_voltage(0);
-  intake.set_brake_mode(pros::MotorBrake::hold);
-  intake2.set_brake_mode(pros::MotorBrake::hold);
-  intake.brake();
-  intake2.brake();
+  //intake.move_voltage(0);
+  //intake2.move_voltage(0);
+  //intake.set_brake_mode(pros::MotorBrake::hold);
+  //intake2.set_brake_mode(pros::MotorBrake::hold);
+  //intake.brake();
+  //intake2.brake();
 
 }
 
 void posIntake(float degrees, float velocity) {
-  intake.move_relative(degrees, velocity);
-  intake2.move_relative(-degrees, velocity);
+  //intake.move_relative(degrees, velocity);
+  //intake2.move_relative(-degrees, velocity);
 }
 
 void autoRedirect() {
@@ -141,66 +141,14 @@ void default_constants() {
 }
 
 void red_right_rush() {
-  sweepArm.set(true);
-  fwrdUntil(46, 100, 27, 40);
-  rushMech.set(true);
-  pros::delay(100);
-  rvs(8, 100);
-  rushMech.set(false);
-  sweepArm.set(false);
-  rvs(8,100);
-  pros::delay(1000);
-  turn(165, 100);
-  rvsUntil(25, 100, 11.5, 40);
-  pros::delay(100);
-  mogoClamp.set(true);
-  pros::delay(100);
-  runIntake(12000);
 
 }
 
 void red_right_win_point() {
-  chassis.pid_swing_set(ez::LEFT_SWING, -90_deg, 100);
-  chassis.pid_wait();
-  runIntake(12000);
-  pros::delay(400);
-  fwrd(15, 100);
-  turn(-90, 100);
-  pros::delay(100);
-  turn(-145, 10);
-  fwrd(10.5, 1278);
-  pros::delay(180);
-  stopIntake();
-  pros::delay(180);
-  turn(-220, 100);
-  rvsUntil(46, 90, 23, 45);
-  mogoClamp.set(true);
-  pros::delay(250);
-  turn(0, 70);
-  runIntake(12000);
-  fwrd(35, 90);
-  pros::delay(150);
-  turn(180, 70);
-  fwrd(48, 60);
 
 }
 
 void red_left_win_point() {
-  rvsUntil(34, 65, 29.6, 40);
-  mogoClamp.set(true);
-  runIntake(12000);
-  pros::delay(100);
-  turn(70, 127);
-  fwrd(25, 90);
-  pros::delay(100);
-  turn(153, 127);
-  fwrd(16.5, 90);
-  rvs(10, 90);
-  turn(-26, 127);
-  fwrd(16.5, 90);
-  rvs(17, 90);
-  turn(-110, 127);
-  fwrd(43, 65);
 
 }
 
@@ -209,23 +157,6 @@ void red_left_four() {
 }
 
 void blue_right_win_point() {
-  rvsUntil(34, 65, 29.6, 40);
-  mogoClamp.set(true);
-  runIntake(12000);
-  pros::delay(100);
-  turn(-70, 127);
-  fwrd(25, 90);
-  pros::delay(100);
-  turn(-153, 127);
-  pros::delay(100);
-  fwrd(16.5, 90);
-  rvs(10, 90);
-  pros::delay(100);
-  turn(-126, 127);
-  fwrd(16.5, 90);
-  rvs(17, 90);
-  turn(110, 127);
-  fwrd(43, 50);
   
 }
 
@@ -234,42 +165,7 @@ void blue_left_rush() {
 }
 
 void blue_left_win_point() {
- /*
-  chassis.pid_swing_set(ez::RIGHT_SWING, 90, 100);
-  chassis.pid_wait();
-  runIntake(12000);
-  pros::delay(400);
-  fwrd(15, 100);
-  turn(90, 100);
-  pros::delay(100);
-  turn(145, 10);
-  fwrd(10.5, 127);
-  stopIntake();
-  pros::delay(180);
-  turn(220, 100);
-  rvsUntil(46, 90, 23, 45);
-  mogoClamp.set(true);
-  pros::delay(100);
-  turn(0, 100);
-  runIntake(12000);
-  fwrd(35, 100);
-  pros::delay(100);
-  turn(-180, 100);
-  fwrd(48, 60);
-  */
-  rvsUntil(35, 65, 29.6, 40);
-  mogoClamp.set(true);
-  pros::delay(250);
-  runIntake(12000);
-  pros::delay(200);
-  turn(70, 90);
-  fwrd(40, 90);
-  turn(250, 90);
-  fwrd(45, 90);
-  sweepArm.set(true);
-  fwrd(50, 90);
-  turn(350, 90);
- 
+
 }
 
 void blue_right_four() {

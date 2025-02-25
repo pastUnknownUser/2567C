@@ -6,7 +6,7 @@
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
-#include "subsystems.hpp"
+#include "subsystems.hpp" // IWYU pragma: keep
 #include "utils.hpp"
 #include "global.h"
 
@@ -18,12 +18,12 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-9, -20,-12},     // Left Chassis Ports (negative port will reverse it!)
-    {1, 2, 13},  // Right Chassis Ports (negative port will reverse it!)
+    {-11, -12,-13},     // Left Chassis Ports (negative port will reverse it!)
+    {17, 18, 1},  // Right Chassis Ports (negative port will reverse it!)
 
-    4,      // IMU Port
+    6,      // IMU Port
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
-    600);   // Wheel RPM
+    450);   // Wheel RPM
 
 /**
  * Runs initialization code. This occurs as soon as the program is started.
@@ -239,6 +239,10 @@ void opcontrol() {
 
   chassis.drive_brake_set(driver_preference_brake);
 
+  ez::PID Lady{1, 0.003, 4, 100, "Lady"};
+  
+  lb.reset();
+
   //intakeStopper.set_led_pwm(50);
 
   //pros::Task redirect(ringDirect);
@@ -255,60 +259,35 @@ void opcontrol() {
     // . . .
     // Put more user control code here!
     // . . .
-    // Intake Control
+
     if (master.get_digital(DIGITAL_R1)) {
-      armPTO.set(false); // Turns arm off
-      pros::delay(50);
-      intake.move_voltage(12000); // intake in
-      intake2.move_voltage(-12000);
+      frontstage.move_voltage(12000);
+      hooks.move_voltage(12000);
     } else if (master.get_digital(DIGITAL_R2)) {
-      armPTO.set(false); // Turns arm off
-      pros::delay(50);
-      intake.move_voltage(-12000); // intake out
-      intake2.move_voltage(12000);
-    } else if (master.get_digital(DIGITAL_L1)) {
-      armPTO.set(true); // Turns arm PTO on for intake motors to move arm
-      pros::delay(50);
-      intake.move_voltage(12000);
-      intake2.move_voltage(-12000);
-    } else if (master.get_digital(DIGITAL_L2)){
-      armPTO.set(true); // Turns arm PTO on for intake motors to move arm
-      pros::delay(50);
-      intake.move_voltage(-12000);
-      intake2.move_voltage(12000);
+      frontstage.move_voltage(-12000);
+      hooks.move_voltage(-12000);
     } else {
-      intake.move_voltage(0); // intake stop
-      intake2.move_voltage(0);
+      frontstage.move_voltage(0);
+      hooks.move_voltage(0);
     }
 
-    if (master.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-      intakeToggleControl++;
-    }
-    if ((intakeToggleControl % 2) == 1) {
-      intake.move_voltage(12000);
-      intake2.move_voltage(-12000);
-    }
-    /*
-    if ((colorSorterControl % 2) == 1) {
-      intakeStopper.set_led_pwm(100);
-      if (intakeStopper.get_hue() < 15 || intakeStopper.get_hue() > 200) {
-        pros::Task redirect(ringDirect);
-      }
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+      lbm.move_voltage(12000);
+    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+      lbm.move_voltage(-12000);
     } else {
-      intakeStopper.set_led_pwm(0);
+      lbm.move_voltage(0);
+      lbm.brake();
     }
-    */
 
-    mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
-
-    sweepArm.button_toggle(master.get_digital(DIGITAL_Y));
-
-    rushMech.button_toggle(master.get_digital(DIGITAL_RIGHT));
-
-    if (master.get_digital_new_press(DIGITAL_DOWN)) {
-      colorSorterControl++; // keeps track if on or off
-      std::cout << "Added!!!" << colorSorterControl << std::endl;
-    }
+    
+    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
+      Lady.target_set(90);
+  
+    } 
+  
+    lbm.move(Lady.compute(lb.get_position()));
+  
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

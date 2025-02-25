@@ -1,8 +1,10 @@
+#include "EZ-Template/PID.hpp"
 #include "EZ-Template/util.hpp" // IWYU pragma: keep
 #include "autons.hpp"
 #include "liblvgl/core/lv_obj_class.h" // IWYU pragma: keep
 #include "main.h" // IWYU pragma: keep
 #include "pros/colors.h" // IWYU pragma: keep
+#include "pros/misc.h"
 #include "pros/rtos.hpp"
 #include "subsystems.hpp"
 #include "global.h"
@@ -12,6 +14,7 @@ void live_Data() {
   while (true) {
     std::cout << "Heading: " << chassis.drive_imu_get() << std::endl;
     std::cout << "Hue: " << intakeStopper.get_hue() << std::endl;
+    std::cout << "POS: " << lb.get_position() << std::endl;
     pros::delay(100);
   }
 }
@@ -20,8 +23,7 @@ void ringDirect() {
   intakeToggleControl++;
   stopIntake();
   pros::delay(100);
-  intake.move_relative(270, 100);
-  intake2.move_relative(-270, 100);
+
   pros::delay(1000);
   std::cout << "adkjhafklsjhdflkjsdhf" << std::endl;
 }
@@ -33,8 +35,7 @@ void autoRingDirect() {
     if (intakeStopper.get_hue() < 15) {
       stopIntake();
       pros::delay(100);
-      intake.move_relative(-270, 100);
-      intake.move_relative(-270, 100);
+      
       ringCount++;
     }
   }
