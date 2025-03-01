@@ -1,3 +1,4 @@
+#include "autons.hpp"
 #include "EZ-Template/util.hpp"
 #include "liblvgl/core/lv_obj_class.h" // IWYU pragma: keep
 #include "main.h" // IWYU pragma: keep
@@ -50,28 +51,23 @@ void turnUntil(float heading, int speed, float untilAngle, int untilSpeed) {
 }
 
 void runIntake(float voltage) {
-  //intake.move_voltage(voltage); // intake out
-  //intake2.move_voltage(-voltage);
+  hooks.move_voltage(voltage); // intake out
+  frontstage.move_voltage(voltage);
 }
 
 void revRunIntake(float voltage) {
-  //intake.move_voltage(-voltage); // intake out
-  //intake2.move_voltage(voltage);
+  hooks.move_voltage(-voltage); // intake out
+  frontstage.move_voltage(-voltage);
 }
 
 void stopIntake() {
-  //intake.move_voltage(0);
-  //intake2.move_voltage(0);
-  //intake.set_brake_mode(pros::MotorBrake::hold);
-  //intake2.set_brake_mode(pros::MotorBrake::hold);
-  //intake.brake();
-  //intake2.brake();
-
+  hooks.move_voltage(0);
+  frontstage.move_voltage(0);
 }
 
-void posIntake(float degrees, float velocity) {
-  //intake.move_relative(degrees, velocity);
-  //intake2.move_relative(-degrees, velocity);
+void lbr(double degrees) {
+  Lady.target_set(degrees);
+  lbm.move(Lady.compute((lb.get_position())/100));
 }
 
 void autoRedirect() {
@@ -141,11 +137,39 @@ void default_constants() {
 }
 
 void red_right_rush() {
+  rvs(34, 127);
+  pros::delay(120);
+  turn(-40, 100);
+  rvs(13, 65);
+  mogoClamp.set(true);
+  runIntake(12000);
+  pros::delay(550);
+  turn(10, 127);
+  fwrd(15, 127);
+  turn(90, 127);
+  pros::delay(700);
+  mogoClamp.set(false);
+  turn(-97, 127);
+  rvs(15, 90);
+  mogoClamp.set(true);
 
 }
 
 void red_right_win_point() {
-
+  rvs(29, 60);
+  mogoClamp.set(true);
+  runIntake(12000);
+  pros::delay(700);
+  turn(-125, 127);
+  fwrd(30, 127);
+  pros::delay(300);
+  turn(-45, 127);
+  fwrd(42, 90);
+  fwrd(18, 127);
+  rvs(12, 90);
+  pros::delay(500);
+  turn(0, 127);
+  
 }
 
 void red_left_win_point() {
@@ -173,6 +197,18 @@ void blue_right_four() {
 }
 
 void skills() {
+  Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
+  lb.reset();
+  Lady.target_set(108);
+  lbm.move(Lady.compute((lb.get_position())/100));
+  /*
+  runIntake(12000);
+  pros::delay(500);
+  fwrd(15, 100);
+  turn(-90, 100);
+  rvs(20, 100);
+  mogoClamp.set(true);
+  */
 
 }
 

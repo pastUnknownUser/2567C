@@ -1,8 +1,10 @@
 #include "main.h"
+#include "EZ-Template/PID.hpp"
 #include "EZ-Template/auton.hpp"
 #include "EZ-Template/auton_selector.hpp"
 #include "EZ-Template/util.hpp"
 #include "autons.hpp"
+#include "pros/adi.hpp" // IWYU pragma: keep
 #include "pros/misc.h"
 #include "pros/motors.h"
 #include "pros/rtos.hpp"
@@ -18,8 +20,8 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-11, -12,-13},     // Left Chassis Ports (negative port will reverse it!)
-    {17, 18, 1},  // Right Chassis Ports (negative port will reverse it!)
+    {-11, 12,-13},     // Left Chassis Ports (negative port will reverse it!)
+    {17, -18, 1},  // Right Chassis Ports (negative port will reverse it!)
 
     6,      // IMU Port
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -69,6 +71,7 @@ void initialize() {
   chassis.initialize();
   ez::as::initialize();
   master.rumble(chassis.drive_imu_calibrated() ? "." : "---");
+  Lady.i_reset_toggle(false);
   //pros::Task heading(live_heading);
 }
 
@@ -233,15 +236,22 @@ void ez_template_extras() {
  * task, not resume it from where it left off.
  */
 
+
 void opcontrol() {
   // This is preference to what you like to drive on
   pros::motor_brake_mode_e_t driver_preference_brake = MOTOR_BRAKE_COAST;
 
   chassis.drive_brake_set(driver_preference_brake);
 
-  ez::PID Lady{1, 0.003, 4, 100, "Lady"};
+  Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
   
   lb.reset();
+
+  int ladyvar = 2;
+
+  lbm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+
+  bool PIDenable = true;
 
   //intakeStopper.set_led_pwm(50);
 
@@ -271,22 +281,56 @@ void opcontrol() {
       hooks.move_voltage(0);
     }
 
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-      lbm.move_voltage(12000);
-    } else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-      lbm.move_voltage(-12000);
-    } else {
-      lbm.move_voltage(0);
-      lbm.brake();
+    if (master.get_digital_new_press(DIGITAL_DOWN)) {
+      ladyvar++;
+      PIDenable = true;
     }
 
-    
-    if (master.get_digital(pros::E_CONTROLLER_DIGITAL_A)) {
-      Lady.target_set(90);
+    if (PIDenable == true) {
+      if ((ladyvar % 3) == 2) {
+        Lady.target_set(108);
+      }
   
+      if ((ladyvar % 3) == 0) {
+        Lady.target_set(135);
+      }
+  
+      if((ladyvar % 3) == 1) {
+        Lady.target_set(266);
+      }
+    }
+
+    if (master.get_digital(DIGITAL_L1)) {
+      PIDenable = false;
     } 
-  
-    lbm.move(Lady.compute(lb.get_position()));
+    
+    if (master.get_digital(DIGITAL_L2)) {
+      PIDenable = false;
+    } 
+
+    if (PIDenable == false) {
+      if (master.get_digital(DIGITAL_L1)) {
+        lbm.move_voltage(12000);
+      } else if (master.get_digital(DIGITAL_L2)) {
+        lbm.move_voltage(-12000);
+      } else {
+        lbm.move_voltage(0);
+        lbm.brake();
+      }
+
+    }
+    
+
+
+
+    mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
+    lDoinker.button_toggle(master.get_digital(DIGITAL_RIGHT));
+    rDoinker.button_toggle(master.get_digital(DIGITAL_Y));
+    
+    if (PIDenable == true) {
+      lbm.move(Lady.compute((lb.get_position())/100));
+    }
+    
   
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
