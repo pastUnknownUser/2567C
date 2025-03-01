@@ -65,26 +65,18 @@ void stopIntake() {
   frontstage.move_voltage(0);
 }
 
-void lbr(double degrees) {
-  Lady.target_set(degrees);
-  lbm.move(Lady.compute((lb.get_position())/100));
+inline void set_lift(int input) {
+  lbm.move(input);
 }
 
-void autoRedirect() {
-  while (true) {
-    if (colorSorterControl == 1) {
-      intakeStopper.set_led_pwm(100);
-      if (intakeStopper.get_hue() < 15 || intakeStopper.get_hue() > 200) {
-        pros::delay(175);
-        stopIntake();
-        pros::delay(300);
-        revRunIntake(8000);
-      }
-    } else {
-      intakeStopper.set_led_pwm(0);
-    }
-    pros::delay(10);
+void lbr(double target) {
+  Lady.target_set(target);
+  while (Lady.exit_condition({lbm}, true) == ez::RUNNING) {
+    double output = Lady.compute(lb.get_position()/100);
+    set_lift(output);
+    pros::delay(ez::util::DELAY_TIME);
   }
+  lbm.move(0);
 }
 
 void colorSort() {
@@ -197,17 +189,19 @@ void blue_right_four() {
 }
 
 void skills() {
-  Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
-  lb.reset();
-  Lady.target_set(108);
-  lbm.move(Lady.compute((lb.get_position())/100));
+  lbr(108);
   /*
   runIntake(12000);
   pros::delay(500);
-  fwrd(15, 100);
+  fwrd(12, 100);
   turn(-90, 100);
-  rvs(20, 100);
+  rvs(18,70);
   mogoClamp.set(true);
+  pros::delay(200);
+  turn(15, 100);
+  fwrd(25, 100);
+  turn(25, 100);
+  fwrd(60, 100);
   */
 
 }
