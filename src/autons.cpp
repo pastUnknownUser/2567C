@@ -72,7 +72,7 @@ inline void set_lift(int input) {
 void lbr(double target) {
   Lady.target_set(target);
   while (Lady.exit_condition({lbm}, true) == ez::RUNNING) {
-    double output = Lady.compute(lb.get_position()/100);
+    double output = Lady.compute(lb.get_position()/100.0);
     set_lift(output);
     pros::delay(ez::util::DELAY_TIME);
   }
@@ -189,19 +189,20 @@ void blue_right_four() {
 }
 
 void skills() {
-  lbr(108);
+  lbr(135);
   /*
   runIntake(12000);
   pros::delay(500);
   fwrd(12, 100);
   turn(-90, 100);
-  rvs(18,70);
+  rvs(19,65);
   mogoClamp.set(true);
-  pros::delay(200);
+  pros::delay(250);
   turn(15, 100);
   fwrd(25, 100);
-  turn(25, 100);
-  fwrd(60, 100);
+  turn(26, 100);
+  fwrdUntil(60, 100, 55, 60);
+  turn(180, 100);
   */
 
 }
