@@ -253,12 +253,6 @@ void opcontrol() {
 
   bool PIDenable = true;
 
-  //intakeStopper.set_led_pwm(50);
-
-  //pros::Task redirect(ringDirect);
-
-  //pros::Task data(live_Data);
-
   while (true) {
     chassis.opcontrol_tank();  // Tank control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
@@ -292,7 +286,7 @@ void opcontrol() {
       }
   
       if ((ladyvar % 3) == 0) {
-        Lady.target_set(135);
+        Lady.target_set(137);
       }
   
       if((ladyvar % 3) == 1) {
@@ -319,16 +313,13 @@ void opcontrol() {
       }
 
     }
-    
-
-
 
     mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
     lDoinker.button_toggle(master.get_digital(DIGITAL_RIGHT));
     rDoinker.button_toggle(master.get_digital(DIGITAL_Y));
     
     if (PIDenable == true) {
-      lbm.move(Lady.compute((lb.get_position())/100));
+      lbm.move(Lady.compute((lb.get_position())/100.0));
     }
     
   

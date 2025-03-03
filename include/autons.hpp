@@ -14,6 +14,7 @@ void blue_left_rush();
 void blue_right_four();
 void blue_left_win_point();
 void red_left_win_point();
+void lbr();
 void skills();
 void test();
 void wait_until_change_speed();

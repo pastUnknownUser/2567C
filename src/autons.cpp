@@ -14,6 +14,8 @@
 // https://ez-robotics.github.io/EZ-Template/
 /////
 
+int lbrd;
+
 void fwrd(float distance, int speed) {
   chassis.pid_drive_set(distance, speed, true);
   chassis.pid_wait();
@@ -69,14 +71,16 @@ inline void set_lift(int input) {
   lbm.move(input);
 }
 
-void lbr(double target) {
-  Lady.target_set(target);
-  while (Lady.exit_condition({lbm}, true) == ez::RUNNING) {
+void lbr() {
+  Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
+  lb.reset();
+  while (true) {
+    Lady.target_set(lbrd);
     double output = Lady.compute(lb.get_position()/100.0);
     set_lift(output);
     pros::delay(ez::util::DELAY_TIME);
   }
-  lbm.move(0);
+  
 }
 
 void colorSort() {
@@ -165,7 +169,36 @@ void red_right_win_point() {
 }
 
 void red_left_win_point() {
-
+  rvs(18, 100);
+  turn(18.5,100);
+  rvs(23.8, 65);
+  pros::delay(250);
+  mogoClamp.set(true);
+  pros::delay(350);
+  runIntake(12000);
+  pros::delay(350);
+  turn(125, 80);
+  fwrd(25, 65);
+  pros::delay(200);
+  turn(209, 100);
+  fwrd(13.8, 80);
+  pros::delay(250);
+  rvs(9, 100);
+  turn(235, 100);
+  fwrd(9.6, 100);
+  pros::delay(250);
+  rvs(21, 100);
+  pros::delay(100);
+  turn(48, 100);
+  fwrd(60, 80);
+  fwrd(10, 100);
+  pros::delay(250);
+  rvs(15, 70);
+  turn(-59, 100);
+  pros::delay(2000);
+  revRunIntake(12000);
+  fwrd(85, 100);
+ 
 }
 
 void red_left_four() {
@@ -173,7 +206,36 @@ void red_left_four() {
 }
 
 void blue_right_win_point() {
-  
+  rvs(18, 100);
+  turn(-27,100);
+  rvs(25.3, 70);
+  pros::delay(130);
+  mogoClamp.set(true);
+  pros::delay(330);
+  runIntake(12000);
+  pros::delay(260);
+  turn(-125, 75);
+  fwrd(18.8, 65);
+  pros::delay(210);
+  turn(-203, 100);
+  fwrd(14.7, 80);
+  pros::delay(180);
+  rvs(9, 100);
+  turn(-235, 100);
+  fwrd(11.9, 100);
+  pros::delay(230);
+  rvs(21, 100);
+  pros::delay(80);
+  turn(-65.5, 100);
+  fwrd(42, 90);
+  fwrd(8, 110);
+  pros::delay(250);
+  rvs(15, 75);
+  turn(45, 100);
+  pros::delay(350);
+  revRunIntake(12000);
+  fwrd(85, 100);
+
 }
 
 void blue_left_rush() {
@@ -181,6 +243,29 @@ void blue_left_rush() {
 }
 
 void blue_left_win_point() {
+  pros::Task ladybrown(lbr);
+  lbrd = 340;
+  pros::delay(1000);
+  lbrd = 108;
+  rvsUntil(18.2, 100, 9.1, 60);
+  turn(30,80);
+  rvs(25, 70);
+  pros::delay(300);
+  mogoClamp.set(true);
+  pros::delay(300);
+  runIntake(12000);
+  turn(120, 80);
+  fwrd(25, 100);
+  pros::delay(200);
+  turn(61, 100);
+  fwrd(45, 100);
+  pros::delay(200);
+  rvs(30, 70);
+  turn(-65, 70);
+  fwrd(60, 30);
+  turn(-80, 50);
+  lbrd = 340;
+
 
 }
 
@@ -189,21 +274,75 @@ void blue_right_four() {
 }
 
 void skills() {
-  lbr(135);
-  /*
+  pros::Task ladybrown(lbr);
+  lbrd = 108;
   runIntake(12000);
-  pros::delay(500);
+  pros::delay(900);
   fwrd(12, 100);
   turn(-90, 100);
-  rvs(19,65);
+  rvs(18.3,65);
   mogoClamp.set(true);
   pros::delay(250);
-  turn(15, 100);
+  turn(15.8, 100);
   fwrd(25, 100);
-  turn(26, 100);
-  fwrdUntil(60, 100, 55, 60);
-  turn(180, 100);
-  */
+  pros::delay(100);
+  turn(26.7, 90);
+  fwrdUntil(59, 100, 54, 60);
+  pros::delay(650);
+  turn(197.3, 75);
+  lbrd = 137;
+  fwrd(29.4, 100);
+  turn(85.1, 90);
+  fwrd(23.41, 60);
+  stopIntake();
+  pros::delay(100);
+  lbrd = 266;
+  pros::delay(1000);
+  rvs(16.5, 80);
+  runIntake(12000);
+  turn(174.8, 100);
+  fwrd(66.5, 63);
+  rvs(19, 100);
+  turn(90, 100);
+  fwrd(20, 100);
+  pros::delay(250);
+  rvs(19, 100);
+  turn(-52, 100);
+  rvs(20, 100);
+  mogoClamp.set(false);
+  lbrd = 108;
+  fwrd(16.54, 100);
+  turn(79, 100);
+  rvs(68, 65);
+  mogoClamp.set(true);
+  pros::delay(250);
+  turn(15.8, 100);
+  fwrd(25,100);
+  turn(-29, 90);
+  fwrdUntil(59, 100, 54, 60);
+  pros::delay(590);
+  turn(-197.3, 75);
+  lbrd = 137;
+  fwrd(29.2, 100);
+  turn(-85.5, 90);
+  fwrd(23.5, 60);
+  stopIntake();
+  pros::delay(100);
+  lbrd = 266;
+  pros::delay(1000);
+  rvs(16.5, 80);
+  runIntake(12000);
+  turn(-175.5, 100);
+  fwrd(66.5, 68);
+  rvs(19, 100);
+  turn(-90, 100);
+  fwrd(20, 100);
+  pros::delay(200);
+  rvs(19, 100);
+  turn(52, 100);
+  rvs(20, 100);
+  mogoClamp.set(false);
+  lbrd = 108;
 
 }
 
