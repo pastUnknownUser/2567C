@@ -4,6 +4,7 @@
 #include "EZ-Template/auton_selector.hpp"
 #include "EZ-Template/util.hpp"
 #include "autons.hpp"
+#include "liblvgl/font/lv_symbol_def.h" // IWYU pragma: keep
 #include "pros/adi.hpp" // IWYU pragma: keep
 #include "pros/misc.h"
 #include "pros/motors.h"
@@ -20,10 +21,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-11, 12,-13},     // Left Chassis Ports (negative port will reverse it!)
-    {17, -18, 1},  // Right Chassis Ports (negative port will reverse it!)
+    {-15, 6,-11},     // Left Chassis Ports (negative port will reverse it!)
+    {-16, 17, 20},  // Right Chassis Ports (negative port will reverse it!)
 
-    6,      // IMU Port
+    3,      // IMU Port
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);   // Wheel RPM
 
@@ -253,6 +254,10 @@ void opcontrol() {
 
   bool PIDenable = true;
 
+  pros::Task asdf(colorSort);
+
+  asdf.suspend();
+
   while (true) {
     chassis.opcontrol_tank();  // Tank control
     // chassis.opcontrol_arcade_standard(ez::SPLIT);   // Standard split arcade
@@ -264,15 +269,18 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
 
-    if (master.get_digital(DIGITAL_R1)) {
-      frontstage.move_voltage(12000);
-      hooks.move_voltage(12000);
-    } else if (master.get_digital(DIGITAL_R2)) {
-      frontstage.move_voltage(-12000);
-      hooks.move_voltage(-12000);
-    } else {
-      frontstage.move_voltage(0);
-      hooks.move_voltage(0);
+    if ((colorSorterControl % 2) == 0) {
+      //asdf.suspend();
+      if (master.get_digital(DIGITAL_R1)) {
+        frontstage.move_voltage(12000);
+        hooks.move_voltage(12000);
+      } else if (master.get_digital(DIGITAL_R2)) {
+        frontstage.move_voltage(-12000);
+        hooks.move_voltage(-12000);
+      } else {
+        frontstage.move_voltage(0);
+        hooks.move_voltage(0);
+      }
     }
 
     if (master.get_digital_new_press(DIGITAL_DOWN)) {
@@ -282,7 +290,7 @@ void opcontrol() {
 
     if (PIDenable == true) {
       if ((ladyvar % 3) == 2) {
-        Lady.target_set(108);
+        Lady.target_set(112);
       }
   
       if ((ladyvar % 3) == 0) {
@@ -311,7 +319,14 @@ void opcontrol() {
         lbm.move_voltage(0);
         lbm.brake();
       }
+    }
 
+    if (master.get_digital_new_press(DIGITAL_A)) {
+      colorSorterControl++;
+    }
+
+    if ((colorSorterControl % 2) == 1) {
+      asdf.resume();
     }
 
     mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
@@ -321,8 +336,6 @@ void opcontrol() {
     if (PIDenable == true) {
       lbm.move(Lady.compute((lb.get_position())/100.0));
     }
-    
-  
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

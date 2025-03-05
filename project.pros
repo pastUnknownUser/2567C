@@ -425,7 +425,7 @@
     },
     "upload_options": {
       "description": "2567C",
-      "after": "run"
+      "after": "none"
     },
     "use_early_access": false
   }

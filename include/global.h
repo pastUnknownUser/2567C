@@ -2,3 +2,4 @@
 
 extern int colorSorterControl;
 extern int intakeToggleControl;
+extern bool color;

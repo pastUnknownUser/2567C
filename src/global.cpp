@@ -4,3 +4,4 @@
 
 int colorSorterControl = 0; 
 int intakeToggleControl = 0; 
+bool color;

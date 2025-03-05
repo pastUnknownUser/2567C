@@ -7,10 +7,10 @@
 
 // Your motors, sensors, etc. should go here.  Below are examples
 
-inline pros::Motor frontstage(16);
-inline pros::Motor hooks(-5);
-inline pros::Motor lbm(15);
-inline pros::Optical intakeStopper(10);
+inline pros::Motor frontstage(-1);
+inline pros::Motor hooks(5);
+inline pros::Motor lbm(14);
+inline pros::Optical colorSensor(10);
 inline pros::Rotation lb(9);
 inline ez::PID Lady{1.5, 0.003, 4, 100, "Lady"};
 inline ez::Piston lDoinker('H');
