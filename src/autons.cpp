@@ -4,6 +4,7 @@
 #include "main.h" // IWYU pragma: keep
 #include "pros/abstract_motor.hpp" // IWYU pragma: keep
 #include "pros/motors.h"
+#include "pros/rtos.h" // IWYU pragma: keep
 #include "pros/rtos.hpp"
 #include "subsystems.hpp"
 #include "utils.hpp"
@@ -81,12 +82,6 @@ void lbr() {
     pros::delay(ez::util::DELAY_TIME);
   }
   
-}
-
-void colorSort() {
-  while (true) {
-    
-  }
 }
 
 // These are out of 127
@@ -275,74 +270,91 @@ void blue_right_four() {
 
 void skills() {
   pros::Task ladybrown(lbr);
-  lbrd = 108;
-  runIntake(12000);
-  pros::delay(900);
-  fwrd(12, 100);
-  turn(-90, 100);
-  rvs(18.3,65);
-  mogoClamp.set(true);
-  pros::delay(250);
-  turn(15.8, 100);
-  fwrd(25, 100);
-  pros::delay(100);
-  turn(26.7, 90);
-  fwrdUntil(59, 100, 54, 60);
-  pros::delay(650);
-  turn(197.3, 75);
-  lbrd = 137;
-  fwrd(29.4, 100);
-  turn(85.1, 90);
-  fwrd(23.41, 60);
-  stopIntake();
-  pros::delay(100);
-  lbrd = 266;
-  pros::delay(1000);
-  rvs(16.5, 80);
-  runIntake(12000);
-  turn(174.8, 100);
-  fwrd(66.5, 63);
-  rvs(19, 100);
-  turn(90, 100);
-  fwrd(20, 100);
-  pros::delay(250);
-  rvs(19, 100);
-  turn(-52, 100);
-  rvs(20, 100);
-  mogoClamp.set(false);
-  lbrd = 108;
-  fwrd(16.54, 100);
-  turn(79, 100);
-  rvs(68, 65);
-  mogoClamp.set(true);
-  pros::delay(250);
-  turn(15.8, 100);
-  fwrd(25,100);
-  turn(-29, 90);
-  fwrdUntil(59, 100, 54, 60);
-  pros::delay(590);
-  turn(-197.3, 75);
-  lbrd = 137;
-  fwrd(29.2, 100);
-  turn(-85.5, 90);
-  fwrd(23.5, 60);
-  stopIntake();
-  pros::delay(100);
-  lbrd = 266;
-  pros::delay(1000);
-  rvs(16.5, 80);
-  runIntake(12000);
-  turn(-175.5, 100);
-  fwrd(66.5, 68);
-  rvs(19, 100);
-  turn(-90, 100);
-  fwrd(20, 100);
+  lbrd = 290;
+  pros::delay(500);
+  rvs(15, 50);
+  lbrd = 116;
   pros::delay(200);
-  rvs(19, 100);
-  turn(52, 100);
-  rvs(20, 100);
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(130, 80);
+  revRunIntake(12000);
+  pros::delay(100);
+  runIntake(12000);
+  fwrd(20, 80);
+  turn(150, 100);
+  pros::delay(50);
+  fwrd(53, 100);
+  turn(125, 100);
+  rvs(20.1, 100);
+  turn(212.8, 100);
+  lbrd = 138;
+  fwrd(22, 80);
+  pros::delay(650);
+  revRunIntake(8000);
+  pros::delay(100);
+  stopIntake();
+  pros::delay(50);
+  lbrd = 266;
+  pros::delay(500);
+  rvs(15.6, 50);
+  lbrd = 116; 
+  runIntake(12000);
+  turn(299.5, 100);
+  fwrd(60, 90);
+  rvs(21, 100);
+  turn(256.5, 100);
+  fwrd(15, 100);
+  pros::delay(100);
+  rvs(12, 100);
+  turn(85, 100);
+  rvs(18, 100);
   mogoClamp.set(false);
-  lbrd = 108;
+  fwrd(8.45, 80);
+  pros::delay(50);
+  turn(205, 50);
+  rvs(71.85, 60);
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(105, 80);
+  revRunIntake(12000);
+  pros::delay(100);
+  runIntake(12000);
+  fwrd(23.2, 80);
+  turn(83.5, 100);
+  pros::delay(50);
+  fwrd(56.2, 100);
+  turn(90, 100);
+  rvs(20.3, 100);
+  turn(27.5, 100);
+  lbrd = 138;
+  fwrd(22, 100);
+  pros::delay(650);
+  revRunIntake(8000);
+  pros::delay(100);
+  stopIntake();
+  pros::delay(50);
+  lbrd = 266;
+  pros::delay(500);
+  rvs(16.9, 50);
+  lbrd = 116;
+  runIntake(12000);
+  turn(-60, 100);
+  fwrd(60, 100);
+  rvs(22, 100);
+  turn(15, 100);
+  fwrd(17, 100);
+  pros::delay(100);
+  rvs(12, 100);
+  turn(142, 100);
+  rvs(17, 100);
+  mogoClamp.set(false);
+  turn(120, 100);
+  fwrd(83, 100);
+  turn(185, 100);
+  fwrd(35, 100);
+  turn(40, 100);
+  fwrd(60, 100);
 
 }
 

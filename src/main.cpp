@@ -22,7 +22,7 @@
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
     {-15, 6,-11},     // Left Chassis Ports (negative port will reverse it!)
-    {-16, 17, 20},  // Right Chassis Ports (negative port will reverse it!)
+    {-18, 17, 20},  // Right Chassis Ports (negative port will reverse it!)
 
     3,      // IMU Port
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
@@ -250,13 +250,13 @@ void opcontrol() {
 
   int ladyvar = 2;
 
+  int frontEnable = 0;
+
   lbm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
   bool PIDenable = true;
 
   pros::Task asdf(colorSort);
-
-  asdf.suspend();
 
   while (true) {
     chassis.opcontrol_tank();  // Tank control
@@ -290,7 +290,7 @@ void opcontrol() {
 
     if (PIDenable == true) {
       if ((ladyvar % 3) == 2) {
-        Lady.target_set(112);
+        Lady.target_set(116);
       }
   
       if ((ladyvar % 3) == 0) {
@@ -321,13 +321,33 @@ void opcontrol() {
       }
     }
 
-    if (master.get_digital_new_press(DIGITAL_A)) {
-      colorSorterControl++;
+    if (master.get_digital_new_press(DIGITAL_UP)) {
+      frontEnable++;
     }
 
-    if ((colorSorterControl % 2) == 1) {
-      asdf.resume();
+    if ((frontEnable % 2) == 1) {
+      frontstage.move_voltage(12000);
+      if (master.get_digital(DIGITAL_R1)) {
+        hooks.move(12000);
+      } else {
+        hooks.move_voltage(0);
+      }
     }
+
+    if((frontEnable % 2) == 0) {
+      if (master.get_digital(DIGITAL_R1)) {
+        frontstage.move_voltage(12000);
+        hooks.move_voltage(12000);
+      } else if (master.get_digital(DIGITAL_R2)) {
+        frontstage.move_voltage(-12000);
+        hooks.move_voltage(-12000);
+      } else {
+        frontstage.move_voltage(0);
+        hooks.move_voltage(0);
+      }
+    }
+
+
 
     mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
     lDoinker.button_toggle(master.get_digital(DIGITAL_RIGHT));

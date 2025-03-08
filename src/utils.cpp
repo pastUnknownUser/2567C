@@ -44,7 +44,7 @@ void autoRingDirect() {
 
 void colorSort() {
   while (true) {
-    runIntake();
+    //runIntake(12000);
     if (color == 0) { // blue
       if (colorSensor.get_hue()) {
         stopIntake();

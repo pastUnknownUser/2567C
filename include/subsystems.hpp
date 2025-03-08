@@ -7,8 +7,8 @@
 
 // Your motors, sensors, etc. should go here.  Below are examples
 
-inline pros::Motor frontstage(-1);
-inline pros::Motor hooks(5);
+inline pros::Motor frontstage(5);
+inline pros::Motor hooks(-1);
 inline pros::Motor lbm(14);
 inline pros::Optical colorSensor(10);
 inline pros::Rotation lb(9);
