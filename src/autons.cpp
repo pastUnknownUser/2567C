@@ -18,12 +18,12 @@
 int lbrd;
 
 void fwrd(float distance, int speed) {
-  chassis.pid_drive_set(distance, speed, true);
+  chassis.pid_odom_set(distance, speed, true);
   chassis.pid_wait();
 }
 
 void rvs(float distance, int speed) {
-  chassis.pid_drive_set(-distance, speed, true);
+  chassis.pid_odom_set(-distance, speed, true);
   chassis.pid_wait();
 }
 

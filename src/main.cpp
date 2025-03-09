@@ -347,8 +347,6 @@ void opcontrol() {
       }
     }
 
-
-
     mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
     lDoinker.button_toggle(master.get_digital(DIGITAL_RIGHT));
     rDoinker.button_toggle(master.get_digital(DIGITAL_Y));
