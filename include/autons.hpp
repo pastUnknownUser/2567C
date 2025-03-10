@@ -11,7 +11,7 @@ void red_right_rush();
 void red_left_four();
 void blue_right_win_point();
 void blue_left_rush();
-void blue_right_four();
+void blue();
 void blue_left_win_point();
 void red_left_win_point();
 void lbr();

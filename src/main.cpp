@@ -62,7 +62,7 @@ void initialize() {
       Auton("blue left wp", blue_left_win_point),
       Auton("SKILLS", skills),
       Auton("red left four", red_left_four),
-      Auton("blue right four", blue_right_four),
+      Auton("blue right four", blue),
       Auton("test", test),
     
      

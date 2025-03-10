@@ -264,7 +264,7 @@ void blue_left_win_point() {
 
 }
 
-void blue_right_four() {
+void blue() {
 
 }
 
