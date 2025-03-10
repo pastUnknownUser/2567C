@@ -162,7 +162,47 @@ void red_right_win_point() {
   turn(0, 127);
   
 }
+void red_right_rush_stateswinpoint() {
+  pros::Task ladybrown(lbr);
+  lDoinker.set(true);
+  fwrd(34, 127);
+  lDoinker.set(false);
+  pros::delay(200);
+  rvs(10, 90);
+  lDoinker.set(true);
+  pros::delay(100);
+  rvs(5, 90);
+  lDoinker.set(false);
+  turn(160, 127);
+  pros::delay(100);
+  rvs(18, 50);
+  pros::delay(100);
+  mogoClamp.set(true);
+  pros::delay(250);
+  runIntake(12000);
+  turn(50, 127);
+  fwrd(10, 127);
+  rvs(10, 90);
+  turn(160, 127);
+  mogoClamp.set(false);
+  fwrd(5, 127);
+  turn(50, 127);
+  rvs(10, 50);
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(140, 127);
+  fwrd(30, 127);
+  turn(60, 127);
+  fwrd(30, 127);
+  pros::delay(250);
+  rvs(5, 127);
+  IntakeLift.set(true);
+  fwrd(5, 127);
+  pros::delay(250);
+  IntakeLift.set(false);
+  rvs(45, 127);
 
+}
 void red_left_win_point() {
   rvs(18, 100);
   turn(18.5,100);
@@ -282,14 +322,14 @@ void skills() {
   pros::delay(100);
   runIntake(12000);
   fwrd(20, 80);
-  turn(150, 100);
+  turn(148, 100);
   pros::delay(50);
   fwrd(53, 100);
   turn(125, 100);
   rvs(20.1, 100);
   turn(212.8, 100);
   lbrd = 138;
-  fwrd(22, 80);
+  fwrd(20, 70);
   pros::delay(650);
   revRunIntake(8000);
   pros::delay(100);

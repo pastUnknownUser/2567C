@@ -16,3 +16,4 @@ inline ez::PID Lady{1.5, 0.003, 4, 100, "Lady"};
 inline ez::Piston lDoinker('H');
 inline ez::Piston mogoClamp('F');
 inline ez::Piston rDoinker('G');
+inline ez::Piston IntakeLift('A');

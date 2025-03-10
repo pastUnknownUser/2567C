@@ -56,6 +56,7 @@ void initialize() {
   ez::as::auton_selector.autons_add({
       Auton("red right rush", red_right_rush),
       Auton("red right wp", red_right_win_point),
+      Auton("red right goal rush win point", red_right_rush_stateswinpoint),
       Auton("red left wp", red_left_win_point),
       Auton("blue right wp", blue_right_win_point),
       Auton("blue left rush", blue_left_rush),
