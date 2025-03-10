@@ -322,12 +322,12 @@ void skills() {
   pros::delay(100);
   runIntake(12000);
   fwrd(20, 80);
-  turn(148, 100);
+  turn(146, 100);
   pros::delay(50);
   fwrd(53, 100);
   turn(125, 100);
   rvs(20.1, 100);
-  turn(212.8, 100);
+  turn(212.9, 100);
   lbrd = 138;
   fwrd(20, 70);
   pros::delay(650);
