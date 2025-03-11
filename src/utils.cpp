@@ -4,7 +4,7 @@
 #include "liblvgl/core/lv_obj_class.h" // IWYU pragma: keep
 #include "main.h" // IWYU pragma: keep
 #include "pros/colors.h" // IWYU pragma: keep
-#include "pros/colors.hpp"
+#include "pros/colors.hpp" // IWYU pragma: keep
 #include "pros/misc.h" // IWYU pragma: keep
 #include "pros/rtos.hpp"
 #include "subsystems.hpp"
