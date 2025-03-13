@@ -54,6 +54,7 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
+    Auton("Solo Win Point, Alliance, mogo, 2 rings on another", solowinpointstate),
       Auton("red right rush", red_right_rush),
       Auton("red right wp", red_right_win_point),
       Auton("red right goal rush win point", red_right_rush_stateswinpoint),

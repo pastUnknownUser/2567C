@@ -6,6 +6,7 @@ extern Drive chassis;
 
 void runIntake();
 void stopIntake();
+void solowinpointstate();
 void red_right_win_point();
 void red_right_rush();
 void red_right_rush_stateswinpoint();

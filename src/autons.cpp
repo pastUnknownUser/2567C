@@ -127,6 +127,53 @@ void default_constants() {
   chassis.pid_angle_behavior_set(ez::shortest);  // Changes the default behavior for turning, this defaults it to the shortest path there
 }
 
+void solowinpointstate() {
+  pros::Task ladybrown(lbr);
+  fwrd(6, 110);
+  lbrd = 310;
+  pros::delay(800);
+  rvs( 22, 127);
+  rvs(14,65);
+  lbrd = 100;
+ pros::delay(150);
+ mogoClamp.set(true);
+ pros::delay(150);
+ turn(125, 127);
+ runIntake(12000);
+ fwrd(18,127);
+ turn(-33, 127);
+ pros::delay(200);
+ mogoClamp.set(false);
+ runIntake(12000);
+ fwrd(40,75);
+ runIntake(12000);
+ pros::delay(200);
+ fwrd(5,127);
+ pros::delay(250);
+ runIntake(0);
+ frontstage.move_voltage(12000);
+fwrd(5,127);
+runIntake(0);
+fwrd(10,127);
+pros::delay(100);
+turn(50,127);
+rvs(30,127);
+rvs(3, 55);
+mogoClamp.set(true);
+pros::delay(150);
+turn(-75,127);
+runIntake(12000);
+fwrd(22,127);
+rvs(10,127);
+turn(120,127);
+lbrd = 315;
+fwrd(18,127);
+
+
+
+
+}
+
 void red_right_rush() {
   rvs(34, 127);
   pros::delay(120);
