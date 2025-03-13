@@ -284,7 +284,30 @@ void red_left_win_point() {
 }
 
 void red_left_four() {
-  
+  pros::Task ladybrown(lbr);
+  fwrd(6, 110);
+  lbrd = 310;
+  pros::delay(800);
+  rvs( 22, 127);
+  rvs(14,65);
+  lbrd = 100;
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(160,127);
+  lDoinker.set(true);
+  runIntake(12000);
+  fwrd(27,127);
+  pros::delay(100);
+  rvs(15,127);
+  lDoinker.set(false);
+  pros::delay(100);
+  turn(150,127);
+  fwrd(10,127);
+  rvs(10,127);
+  turn(105,127);
+  fwrd(15,127);
+
+  ladybrown.suspend();
 }
 
 void blue_right_win_point() {

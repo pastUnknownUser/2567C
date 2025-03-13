@@ -56,6 +56,7 @@ void initialize() {
   ez::as::auton_selector.autons_add({
     Auton("Solo Win Point, Alliance, mogo, 2 rings on another", solowinpointstate),
       Auton("red right rush", red_right_rush),
+      Auton("red left ring rush", red_left_four),
       Auton("red right wp", red_right_win_point),
       Auton("red right goal rush win point", red_right_rush_stateswinpoint),
       Auton("red left wp", red_left_win_point),
@@ -63,7 +64,6 @@ void initialize() {
       Auton("blue left rush", blue_left_rush),
       Auton("blue left wp", blue_left_win_point),
       Auton("SKILLS", skills),
-      Auton("red left four", red_left_four),
       Auton("blue right four", blue),
       Auton("test", test),
     
