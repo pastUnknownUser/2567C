@@ -15,7 +15,11 @@ void blue_right_win_point();
 void blue_left_rush();
 void blue();
 void blue_left_win_point();
-
+void blue_left_goal_rush();
+void blue_left();
+void blue_right_ring_rush();
+void red_right_Simple_Wmiddlering();
+void blue_left_Simple_Wmiddlering();
 void lbr();
 void skills();
 void test();

@@ -1,8 +1,12 @@
 #include "autons.hpp"
+#include <sys/syslimits.h>
+#include "EZ-Template/PID.hpp"
 #include "EZ-Template/util.hpp"
 #include "liblvgl/core/lv_obj_class.h" // IWYU pragma: keep
+#include "liblvgl/font/lv_symbol_def.h" // IWYU pragma: keep
 #include "main.h" // IWYU pragma: keep
 #include "pros/abstract_motor.hpp" // IWYU pragma: keep
+#include "pros/device.hpp" // IWYU pragma: keep
 #include "pros/motors.h"
 #include "pros/rtos.h" // IWYU pragma: keep
 #include "pros/rtos.hpp"
@@ -15,7 +19,13 @@
 // https://ez-robotics.github.io/EZ-Template/
 /////
 
-int lbrd;
+
+bool On = false;
+bool stuck = false;
+bool antiJam = false;
+bool manualIntake = false;
+bool redNeeded = false;
+bool blueNeeded = false;
 
 void fwrd(float distance, int speed) {
   chassis.pid_odom_set(distance, speed, true);
@@ -53,32 +63,88 @@ void turnUntil(float heading, int speed, float untilAngle, int untilSpeed) {
   chassis.pid_wait();
 }
 
-void runIntake(float voltage) {
-  hooks.move_voltage(voltage); // intake out
-  frontstage.move_voltage(voltage);
+void runIntake() {
+  while (true) {
+    if (manualIntake == false) {
+      if (!On) {
+        ///intake.move_voltage(0);
+        ///intake.move_voltage(0);
+        pros::delay(50);
+        continue;
+      }
+      if ((antiJam = true)) {
+        float hookTorque = intake.get_torque();
+        if (hookTorque <= 0) {
+          stuck = true;
+        }
+  
+        if (stuck == true) {
+          //intake.move_voltage(-12000);
+          pros::delay(150);
+          //intake.move_voltage(0);
+          stuck = false;
+        }
+        if (stuck == false) {
+          //intake.move_voltage(12000);
+          //intake.move_voltage(12000);
+        }
+      }
+      
+      if (On) {
+        //intake.move_voltage(12000);
+        //intake.move_voltage(12000);
+      }
+      
+    }
+    pros::delay(20);
+  }
+}
+
+void colorSort() {
+  colorSensor.set_led_pwm(100);
+  while (true) {
+    long int ringHue = colorSensor.get_hue(); 
+    if ((ringHue < 20) && (redNeeded = true)) {  //red 
+      On = false;
+      pros::delay(400);
+      //intake.set_zero_position(0);
+      //intake.move_relative(500, 40);
+      On = true;
+    }
+    if ((ringHue > 180) && (blueNeeded = true)) {  //blue
+      On = false;
+      pros::delay(400);
+      intake.set_zero_position(0);
+      intake.move_relative(500, 40);
+      On = true;
+    }
+    pros::delay(10);
+  }
 }
 
 void revRunIntake(float voltage) {
-  hooks.move_voltage(-voltage); // intake out
-  frontstage.move_voltage(-voltage);
+  intake.move_voltage(-voltage); // intake out
+  intake.move_voltage(-voltage);
 }
 
 void stopIntake() {
-  hooks.move_voltage(0);
-  frontstage.move_voltage(0);
+  intake.move_voltage(0);
+  intake.move_voltage(0);
 }
 
 inline void set_lift(int input) {
-  lbm.move(input);
+  //lbm.move(input);
 }
 
 void lbr() {
   Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
   lb.reset();
   while (true) {
-    Lady.target_set(lbrd);
-    double output = Lady.compute(lb.get_position()/100.0);
-    set_lift(output);
+    if (PIDenable == 1) {
+      Lady.target_set(lbrd);
+      lbm1.move(Lady.compute(lb.get_position()/100.0));
+      lbm2.move(-Lady.compute(lb.get_position()/100.0));
+    }
     pros::delay(ez::util::DELAY_TIME);
   }
   
@@ -129,74 +195,407 @@ void default_constants() {
 
 void solowinpointstate() {
   pros::Task ladybrown(lbr);
-  fwrd(6, 110);
+  PIDenable = 1;
+
+  fwrd(4, 110);
   lbrd = 310;
-  pros::delay(800);
-  rvs( 22, 127);
-  rvs(14,65);
-  lbrd = 100;
- pros::delay(150);
- mogoClamp.set(true);
- pros::delay(150);
- turn(125, 127);
- runIntake(12000);
- fwrd(18,127);
- turn(-33, 127);
- pros::delay(200);
- mogoClamp.set(false);
- runIntake(12000);
- fwrd(40,75);
- runIntake(12000);
- pros::delay(200);
- fwrd(5,127);
- pros::delay(250);
- runIntake(0);
- frontstage.move_voltage(12000);
-fwrd(5,127);
-runIntake(0);
-fwrd(10,127);
-pros::delay(100);
-turn(50,127);
-rvs(30,127);
-rvs(3, 55);
-mogoClamp.set(true);
-pros::delay(150);
-turn(-75,127);
-runIntake(12000);
-fwrd(22,127);
-rvs(10,127);
-turn(120,127);
-lbrd = 315;
-fwrd(18,127);
+  pros::delay(610);
+  rvs(25, 127);
+  rvs(12,55);
+  lbrd = 116;
+  mogoClamp.set(true);
+  pros::delay(150);
+  turn(123, 127);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  fwrd(18,127);
+  turn(-33, 127);
+  pros::delay(200);
+  mogoClamp.set(false);
+  fwrd(40,75);
+  pros::delay(190);
+  fwrd(5,127);
+  pros::delay(240);
+  intake.move_voltage(0);
+  intake.move_voltage(12000);
+  fwrd(15,127);
+  pros::delay(90);
+  turn(47,127);
+  rvs(38,100);
+  rvs(6, 65);
+  mogoClamp.set(true);
+  pros::delay(150);
+  turn(-75,127);
+  intake.move_voltage(12000);
+  fwrd(22,127);
+  rvs(10,127);
+  turn(120,127);
+  lbrd = 315;
+  fwrd(18,127);
 
 
 
-
+  ladybrown.remove();
 }
 
 void red_right_rush() {
-  rvs(34, 127);
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  pros::delay(2);
+  lbrd = 300;
+  pros::delay(650);
+  rvs(3,127);
+  turn(-40,127);
+  lbrd = 120;
+  rvs(20,127);
+  rvs(11,60);
+  mogoClamp.set(true);
   pros::delay(120);
-  turn(-40, 100);
-  rvs(13, 65);
-  mogoClamp.set(true);
-  runIntake(12000);
-  pros::delay(550);
-  turn(10, 127);
-  fwrd(15, 127);
-  turn(90, 127);
-  pros::delay(700);
-  mogoClamp.set(false);
-  turn(-97, 127);
-  rvs(15, 90);
-  mogoClamp.set(true);
+  turn(-157, 100);
+  lbrd = 300; 
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  fwrd(25,127);
+  pros::delay(200);
+  turn(-83,127);
+  fwrd(44,65);
+  pros::delay(250);
+  rvs(25,100);
+  lbrd = 210;
+  pros::delay(200);
+  turn(65,127);
+  lbrd = 250;
+  intake.move_voltage(-12000);
+  fwrd(38,95);
+  lbrd = 285;
+  
 
+  
+  ladybrown.remove();
 }
 
+void red_right_Simple_Wmiddlering() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  lbrd = 300;
+  pros::delay(400);
+  rvs(2,127);
+  turn(-43,127);
+  lbrd = 120;
+  rvs(20,127);
+  rvs(18,65);
+  mogoClamp.set(true);
+  pros::delay(75);
+  turn(75,127);
+  fwrd(21.5,127);
+  intake.move_voltage(-12000);
+  rDoinker.set(true);
+  pros::delay(50);
+   rvs(20,127);
+   turn(-40,127);
+   rDoinker.set(false);
+   pros::delay(50);
+   intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  turn(-18,127);
+  fwrd(13,127);
+  pros::delay(150);
+  IntakeLift.set(true);
+  fwrd(13,127);
+  IntakeLift.set(false);
+  pros::delay(50);
+  intake.move_voltage(0);
+  pros::delay(50);
+  rvs(30,127);
+  turn(-135,127);
+  intake.move_voltage(12000);
+  fwrd(26, 127);
+  rvs(7,127);
+  turn(-87.5,127);
+  lbrd = 300;
+  intake.move_voltage(12000);
+  fwrdUntil(43, 127, 35, 60);
+  pros::delay(100);
+  rvs(15,127);
+  intake.move_voltage(0);
+  turn(65,127);
+  fwrd(15,127);
+
+
+
+
+  
+  ladybrown.remove();
+}
+
+void blue_left_Simple_Wmiddlering() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  lbrd = 300;
+  pros::delay(400);
+  rvs(4,127);
+  turn(43,127);
+  lbrd = 120;
+  rvs(20,127);
+  rvs(18,65);
+  mogoClamp.set(true);
+  pros::delay(75);
+  turn(-77,127);
+  fwrd(21.5,127);
+  intake.move_voltage(-12000);
+  lDoinker.set(true);
+  pros::delay(50);
+   rvs(23,127);
+   turn(40,127);
+   lDoinker.set(false);
+   pros::delay(50);
+   intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  turn(18,127);
+  fwrd(13,127);
+  pros::delay(150);
+  IntakeLift.set(true);
+  fwrd(13,127);
+  IntakeLift.set(false);
+  pros::delay(50);
+  intake.move_voltage(0);
+  pros::delay(50);
+  rvs(30,127);
+  turn(135,127);
+  intake.move_voltage(12000);
+  fwrd(26, 127);
+  rvs(7,127);
+  turn(83.5,127);
+  lbrd = 300;
+  intake.move_voltage(12000);
+  fwrdUntil(43, 127, 35, 60);
+  pros::delay(100);
+  rvs(15,127);
+  intake.move_voltage(0);
+  turn(-65,127);
+  fwrd(15,127);
+
+
+
+
+  
+  ladybrown.remove();
+}
+
+void blue_left_goal_rush() {
+  
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  rDoinker.set(true);
+  intake.move_voltage(120000);
+  fwrd(37.5, 127);
+  rDoinker.set(false);
+  pros::delay(150);
+  rvs(12.5, 90);
+  rDoinker.set(true);
+  rvs(5,127);
+  rDoinker.set(false);
+  pros::delay(100);
+  turn(15,127);
+  fwrd(6,127);
+  pros::delay(100);
+  lbrd = 350;
+  pros::delay(450);
+  fwrd(7,127);
+  turn(30, 127);
+  rvs(8,127);
+  turn(-63,127);
+  rvsUntil(16,127,7,50);
+  mogoClamp.set(true);
+  pros::delay(100);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  turn(-195,127);
+  //lbrd = 142;
+  IntakeLift.set(true);
+  //pros::delay(100);
+  //intake.move_voltage(0);
+  lbrd = 128;
+  fwrd(28.5,127);
+  IntakeLift.set(false);
+  pros::delay(100);
+  rvs(6,100);
+  //pros::delay(300);
+  intake.move_voltage(10000);
+  /*turn(168,127);
+  fwrd(18,100);
+  intake.move_voltage(0);
+  lbrd = 330;
+  pros::delay(500);
+  revRunIntake(12000);
+  rvs(8,127);
+  lbrd = 266;*/
+  turn(-90,127);
+  intake.move_voltage(120000);
+  intake.move_voltage(12000);
+  lbrd = 300;
+  fwrdUntil(50, 127, 38, 45);
+  fwrd(8,100);
+  pros::delay(100);
+  rvs(40,127);
+  lbrd= 250;
+  turn(65,127);
+  fwrd(15,127);
+  lbrd = 300;
+
+
+
+  
+ // IntakeLift.set(true);
+  /*
+  turn(55,127);
+  rvs(10,70);
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(20,127);
+  fwrd(20,127);
+    */
+
+
+
+
+  
+ // IntakeLift.set(true);
+  /*
+  turn(55,127);
+  rvs(10,70);
+  mogoClamp.set(true);
+  pros::delay(100);
+  turn(20,127);
+  fwrd(20,127);
+    */
+
+  
+  
+
+  ladybrown.remove();
+}
+
+void blue_left() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  pros::delay(2000);
+  lbrd = 300;
+  pros::delay(650);
+  rvs(3,127);
+  turn(45,127);
+  lbrd = 120;
+  rvs(20,127);
+  rvs(11,60);
+  mogoClamp.set(true);
+  pros::delay(120);
+  turn(155, 100);
+  lbrd = 300;
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  fwrd(25,127);
+  pros::delay(200);
+  turn(83,127);
+  fwrd(44,65);
+  pros::delay(250);
+  rvs(25,80);
+  lbrd = 210;
+  turn(-65,127);
+  lbrd = 250;
+  intake.move_voltage(-12000);
+  fwrd(38,95);
+  lbrd = 290;
+
+  ladybrown.remove();
+}
+
+void blue_right_ring_rush() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  //pros::Task intake(runIntake);
+  lbrd = 116;
+  rDoinker.set(true);
+  intake.move_voltage(12000);
+  fwrd(40,127);
+  pros::delay(100);
+  rvs(13, 127);
+  rDoinker.set(false);
+  turn(80,127);
+  rvs(8, 127);
+  rvs(10,48);
+  pros::delay(100);
+  mogoClamp.set(true);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  turn(67,127);
+  fwrd(19,127);
+  pros::delay(200);
+  rvs(10,127);
+  turn(84, 127);
+  fwrd(29.5, 127);
+  pros::delay(100);
+  rvs(10,127);
+  turn(136,127);
+  lbrd = 300;
+  fwrdUntil(45, 127, 38, 25);
+  pros::delay(100);
+  rvs(8,127);
+  turn(230,127);
+  intake.move_voltage(-12000);
+  fwrd(20,127);
+  lbrd = 210;
+  turn(300, 127);
+  lbrd = 266;
+  fwrd(35, 127);
+  lbrd = 280;
+
+  /*
+  intake.move_voltage(0);
+  intake.move_voltage(0);
+  turn(-289, 127);
+  fwrd(10.6, 127);
+  lDoinker.set(true);
+  pros::delay(120);
+  rvs(30, 127);
+  turn(62,127);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  lDoinker.set(false);
+  lbrd = 266;
+  fwrd(15, 100);
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  ladybrown.remove();
+}
+
+
+
+
 void red_right_win_point() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
   rvs(29, 60);
   mogoClamp.set(true);
-  runIntake(12000);
+  On = true;
   pros::delay(700);
   turn(-125, 127);
   fwrd(30, 127);
@@ -208,11 +607,13 @@ void red_right_win_point() {
   pros::delay(500);
   turn(0, 127);
   
+  ladybrown.remove();
 }
 void red_right_rush_stateswinpoint() {
- pros::Task ladybrown(lbr);
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
   lDoinker.set(true);
-  frontstage.move_voltage(12000);
+  intake.move_voltage(120000);
   fwrd(37.5, 127);
   lDoinker.set(false);
   pros::delay(150);
@@ -222,46 +623,50 @@ void red_right_rush_stateswinpoint() {
   lDoinker.set(false);
   pros::delay(100);
   turn(-15,127);
-  fwrd(7.5,127);
+  fwrd(6,127);
   pros::delay(100);
   lbrd = 350;
-  pros::delay(350);
-  fwrd(5,127);
+  pros::delay(450);
+  fwrd(7,127);
   turn(-30, 127);
-  rvs(6,127);
-  turn(60,127);
-  rvsUntil(15,127,7,50);
+  rvs(8,127);
+  turn(63,127);
+  rvsUntil(16,127,7,50);
   mogoClamp.set(true);
   pros::delay(100);
-  frontstage.move_voltage(0);
-  runIntake(12000);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
   turn(195,127);
-  lbrd = 142;
+  //lbrd = 142;
   IntakeLift.set(true);
-  pros::delay(100);
-  fwrd(27.5,127);
+  //pros::delay(100);
+  //intake.move_voltage(0);
+  lbrd = 128;
+  fwrd(28.5,127);
   IntakeLift.set(false);
   pros::delay(100);
-  rvs(6,127);
-  runIntake(12000);
-  pros::delay(300);
-  runIntake(0);
-  hooks.move_voltage(9500);
-  turn(168,127);
-  hooks.move_voltage(0);
-  fwrd(17,100);
+  rvs(6,100);
+  //pros::delay(300);
+  intake.move_voltage(10000);
+  /*turn(168,127);
+  fwrd(18,100);
+  intake.move_voltage(0);
   lbrd = 330;
   pros::delay(500);
-  runIntake(-12000);
-  rvs(7,127);
-  lbrd = 266;
-  turn(73,127);
-  runIntake(12000);
-  fwrd(58, 127);
+  revRunIntake(12000);
+  rvs(8,127);
+  lbrd = 266;*/
+  turn(90,127);
+  intake.move_voltage(120000);
+  intake.move_voltage(12000);
+  lbrd = 300;
+  fwrdUntil(50, 127, 38, 45);
+  fwrd(8,100);
   pros::delay(100);
   rvs(40,127);
+  lbrd = 210;
   turn(-65,127);
-  fwrd(22,127);
+  fwrd(15,127);
   lbrd = 300;
 
 
@@ -278,37 +683,64 @@ void red_right_rush_stateswinpoint() {
     */
 
   
- 
+  ladybrown.remove();
 }
 
 void red_left_four() {
   pros::Task ladybrown(lbr);
-  lbrd = 100;
+  PIDenable = 1;
+  //pros::Task intake(runIntake);
+  lbrd = 116;
   lDoinker.set(true);
-  frontstage.move_voltage(12000);
+  intake.move_voltage(12000);
   fwrd(40,127);
   pros::delay(100);
-  rvs(15, 127);
+  rvs(13, 127);
   lDoinker.set(false);
   turn(-80,127);
   rvs(8, 127);
-  rvs(8,50);
+  rvs(10,48);
   pros::delay(100);
   mogoClamp.set(true);
-  frontstage.move_voltage(0);
-  runIntake(12000);
-  turn(-70,127);
-  fwrd(23,127);
-  turn(-95,127);
-  fwrd(10,127);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  turn(-67,127);
+  fwrd(19,127);
+  pros::delay(200);
+  rvs(10,127);
+  turn(-84, 127);
+  fwrd(29.5, 127);
   pros::delay(100);
-  rvs(5,127);
-  turn(-143,127);
-  fwrdUntil(40, 127, 8, 70);
+  rvs(10,127);
+  turn(-136,127);
+  lbrd = 300;
+  fwrdUntil(45, 127, 38, 25);
   pros::delay(100);
   rvs(8,127);
   turn(-230,127);
   fwrd(20,127);
+  lbrd = 210;
+  turn(-300, 127);
+  lbrd = 266;
+  fwrd(35, 127);
+  lbrd = 280;
+
+  /*
+  intake.move_voltage(0);
+  intake.move_voltage(0);
+  turn(-289, 127);
+  fwrd(10.6, 127);
+  lDoinker.set(true);
+  pros::delay(120);
+  rvs(30, 127);
+  turn(62,127);
+  intake.move_voltage(12000);
+  intake.move_voltage(12000);
+  lDoinker.set(false);
+  lbrd = 266;
+  fwrd(15, 100);
+
+*/
 
 
 
@@ -318,17 +750,20 @@ void red_left_four() {
 
 
 
-  ladybrown.suspend();
+
+  ladybrown.remove();
 }
 
 void blue_right_win_point() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
   rvs(18, 100);
   turn(-27,100);
   rvs(25.3, 70);
   pros::delay(130);
   mogoClamp.set(true);
   pros::delay(330);
-  runIntake(12000);
+  On = true;
   pros::delay(260);
   turn(-125, 75);
   fwrd(18.8, 65);
@@ -352,14 +787,20 @@ void blue_right_win_point() {
   revRunIntake(12000);
   fwrd(85, 100);
 
+  ladybrown.remove();
 }
 
 void blue_left_rush() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
   
+
+  ladybrown.remove();
 }
 
 void blue_left_win_point() {
   pros::Task ladybrown(lbr);
+  PIDenable = 1;
   lbrd = 340;
   pros::delay(1000);
   lbrd = 108;
@@ -369,7 +810,7 @@ void blue_left_win_point() {
   pros::delay(300);
   mogoClamp.set(true);
   pros::delay(300);
-  runIntake(12000);
+  On = true;
   turn(120, 80);
   fwrd(25, 100);
   pros::delay(200);
@@ -382,15 +823,19 @@ void blue_left_win_point() {
   turn(-80, 50);
   lbrd = 340;
 
-
+  ladybrown.remove();
 }
 
 void blue() {
+  pros::Task ladybrown(lbr);
+  PIDenable = 1;
 
 }
 
 void skills() {
   pros::Task ladybrown(lbr);
+  PIDenable = 1;
+  pros::Task intake(runIntake);
   lbrd = 290;
   pros::delay(500);
   rvs(15, 50);
@@ -399,83 +844,107 @@ void skills() {
   mogoClamp.set(true);
   pros::delay(100);
   turn(130, 80);
+  manualIntake = true;
   revRunIntake(12000);
   pros::delay(100);
-  runIntake(12000);
+  manualIntake = false;
+  On = true;
   fwrd(18, 80);
   turn(151, 100);
   pros::delay(50);
-  fwrd(52, 90);
-  turn(127, 100);
-  rvs(19, 100);
+  fwrd(56, 90);
+  turn(138, 100);
+  rvs(20.4, 100);
   turn(214.4, 100);
   lbrd = 138;
   fwrd(20, 70);
-  pros::delay(600);
-  revRunIntake(8000);
-  pros::delay(60);
-  stopIntake();
-  pros::delay(50);
+  pros::delay(750);
+  On = false;
+  pros::delay(90);
   lbrd = 266;
   pros::delay(400);
-  rvs(16.2, 60);
+  rvs(15.8, 60);
   lbrd = 116; 
-  runIntake(12000);
-  turn(304.5, 100);
+  On = true;
+  turn(304.9, 100);
   fwrd(60, 80);
-  rvs(18, 100);
-  turn(256.5, 100);
+  rvs(19, 100);
+  turn(247, 100);
   fwrd(15, 100);
   pros::delay(100);
   rvs(12, 100);
-  turn(95, 100);
+  turn(92, 100);
   rvs(23, 100);
   mogoClamp.set(false);
-  fwrd(8.7, 80);
+  fwrd(8.4, 80);
   pros::delay(50);
-  turn(212, 50);
-  rvs(70, 60);
+  turn(213, 50);
+  rvs(73, 60);
   mogoClamp.set(true);
   pros::delay(100);
-  fwrd(4, 100);
-  turn(110, 80);
-  fwrd(18, 80);
-  rvs(6.5, 100);
-  turn(98, 100);
+  fwrd(3, 100);
+  turn(105.5, 80);
+  fwrd(27, 80);
+  rvs(11.6, 100);
+  turn(90, 100);
   pros::delay(50);
-  fwrd(56.3, 100);
-  turn(130, 100);
-  rvs(20, 100);
-  turn(25, 100);
+  fwrd(65, 100);
+  turn(60, 100);
+  rvs(10, 100);
+  turn(129, 100);
+  rvs(17.3, 100);
+  turn(27, 100);
   lbrd = 138;
-  fwrd(21, 70);
-  pros::delay(600);
-  revRunIntake(8000);
-  pros::delay(60);
-  stopIntake();
-  pros::delay(50);
+  fwrd(26, 70);
+  pros::delay(750);
+  On = false;
+  pros::delay(90);
   lbrd = 266;
   pros::delay(400);
-  rvs(16.9, 50);
+  rvs(15.6, 50);
   lbrd = 116;
-  runIntake(12000);
+  manualIntake = false;
+  On = true;
   turn(-60, 100);
-  fwrd(60, 100);
-  rvs(22, 100);
-  turn(15, 100);
-  fwrd(17, 100);
+  fwrd(65, 85);
+  rvs(22, 127);
+  turn(14, 127);
+  fwrd(17, 127);
   pros::delay(100);
-  rvs(12, 100);
-  turn(142, 100);
-  rvs(17, 100);
+  rvs(12, 127);
+  turn(149, 127);
+  rvs(19, 127);
   mogoClamp.set(false);
-  turn(120, 100);
-  fwrd(73, 100);
-
+  fwrd(8, 127);
+  turn(120, 127);
+  fwrd(73, 127);
+  turn(167, 127);
+  fwrd(64, 127);
+  turn(40, 127);
+  fwrd(70, 127);
+  rvs(35, 127);
+  turn(180, 127);
+  fwrd(70, 127);
+  turn(160, 127);
+  fwrd(75, 127);
+  rvs(20, 127);
+  lbrd = 266;
+  turn(160, 127);
+  rvs(60, 90);
+  fwrd(15, 127);
+  lbrd = 145;
 
 }
 
+
 void test() {
+  colorSensor.set_led_pwm(100);
+  pros::Task intake(runIntake);
+  pros::Task sorter(colorSort);
+  pros::delay(1000);
+  blueNeeded = true;
+  antiJam = false;
+  On = true;
 
 }
 

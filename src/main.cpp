@@ -21,10 +21,10 @@
 // Chassis constructor
 ez::Drive chassis(
     // These are your drive motors, the first motor is used for sensing!
-    {-15, 6,-11},     // Left Chassis Ports (negative port will reverse it!)
-    {-18, 17, 20},  // Right Chassis Ports (negative port will reverse it!)
+    {-17, 18,-19},     // Left Chassis Ports (negative port will reverse it!)
+    {4, -11, 6},  // Right Chassis Ports (negative port will reverse it!)
 
-    3,      // IMU Port
+    21,      // IMU Port
     2.75,  // Wheel Diameter (Remember, 4" wheels without screw holes are actually 4.125!)
     450);   // Wheel RPM
 
@@ -54,20 +54,24 @@ void initialize() {
 
   // Autonomous Selector using LLEMU
   ez::as::auton_selector.autons_add({
-    Auton("Solo Win Point, Alliance, mogo, 2 rings on another", solowinpointstate),
-      Auton("red right rush", red_right_rush),
-      Auton("red left ring rush", red_left_four),
-      Auton("red right wp", red_right_win_point),
-      Auton("red right goal rush win point", red_right_rush_stateswinpoint),
-      
-      Auton("blue right wp", blue_right_win_point),
-      Auton("blue left rush", blue_left_rush),
-      Auton("blue left wp", blue_left_win_point),
-      Auton("SKILLS", skills),
-      Auton("blue right four", blue),
-      Auton("test", test),
-    
-     
+
+  Auton("Solo Win Point, Alliance, mogo, 2 rings on another", solowinpointstate),
+  Auton("red right goal rush win point", red_right_rush_stateswinpoint),
+  Auton("red right", red_right_rush),
+  Auton( "red right with middle ring", red_right_Simple_Wmiddlering),
+  Auton("red left ring rush", red_left_four),
+  Auton("blue left goal rush", blue_left_goal_rush),
+  Auton("blue left", blue_left),
+  Auton(" blue left with middle ring", blue_left_Simple_Wmiddlering),
+  Auton("blue right ring rush", blue_right_ring_rush),
+  Auton("red right wp", red_right_win_point),
+  Auton("blue right wp", blue_right_win_point),
+  Auton("blue left rush", blue_left_rush),
+  Auton("blue left wp", blue_left_win_point),
+  Auton("SKILLS", skills),
+  Auton("blue right four", blue),
+  Auton("test", test),      
+  
   });
 
   // Initialize chassis and auton selector
@@ -118,6 +122,7 @@ void autonomous() {
   chassis.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
   pros::Task data(live_Data);
+  lbrd = 116;
   //intakeStopper.set_led_pwm(100);
   /*
   Odometry and Pure Pursuit are not magic
@@ -246,6 +251,8 @@ void opcontrol() {
 
   chassis.drive_brake_set(driver_preference_brake);
 
+  Lady.constants_set(3, 0, 4);
+
   Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
   
   lb.reset();
@@ -254,11 +261,14 @@ void opcontrol() {
 
   int frontEnable = 0;
 
-  lbm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  lbm1.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+  lbm2.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 
-  bool PIDenable = true;
+  //pros::Task asdf(colorSort);  
 
-  pros::Task asdf(colorSort);  
+  //pros::Task data(live_Data);
+
+  pros::Task ladybrown(lbr);
 
   while (true) {
     chassis.opcontrol_tank();  // Tank control
@@ -271,55 +281,59 @@ void opcontrol() {
     // Put more user control code here!
     // . . .
 
-    if ((colorSorterControl % 2) == 0) {
+    if ((intakeControl % 2) == 0) {
       //asdf.suspend();
       if (master.get_digital(DIGITAL_R1)) {
-        frontstage.move_voltage(12000);
-        hooks.move_voltage(12000);
+        intake.move_voltage(12000);
       } else if (master.get_digital(DIGITAL_R2)) {
-        frontstage.move_voltage(-12000);
-        hooks.move_voltage(-12000);
+        intake.move_voltage(-12000);
       } else {
-        frontstage.move_voltage(0);
-        hooks.move_voltage(0);
+        intake.move_voltage(0);
       }
     }
 
     if (master.get_digital_new_press(DIGITAL_DOWN)) {
       ladyvar++;
-      PIDenable = true;
+      PIDenable = 1;
     }
 
     if (PIDenable == true) {
       if ((ladyvar % 3) == 2) {
-        Lady.target_set(116);
+        //Lady.target_set(297);
+        lbrd = 297;
       }
   
       if ((ladyvar % 3) == 0) {
-        Lady.target_set(137);
+        //Lady.target_set(280);
+        lbrd = 284;
       }
   
       if((ladyvar % 3) == 1) {
-        Lady.target_set(266);
+        //Lady.target_set(155);
+        lbrd = 155;
       }
     }
-
+    
     if (master.get_digital(DIGITAL_L1)) {
-      PIDenable = false;
+      PIDenable = 0;
     } 
     
     if (master.get_digital(DIGITAL_L2)) {
-      PIDenable = false;
+      PIDenable = 0;
     } 
-
-    if (PIDenable == false) {
+    
+    if (PIDenable == 0) {
       if (master.get_digital(DIGITAL_L1)) {
-        lbm.move_voltage(12000);
+        lbm1.move_voltage(-12000);
+        lbm2.move_voltage(12000);
       } else if (master.get_digital(DIGITAL_L2)) {
-        lbm.move_voltage(-12000);
+        lbm1.move_voltage(12000);
+        lbm2.move_voltage(-12000);
       } else {
-        lbm.move_voltage(0);
-        lbm.brake();
+        lbm1.move_voltage(0);
+        lbm2.move_voltage(0);
+        lbm1.brake();
+        lbm2.brake();
       }
     }
 
@@ -328,34 +342,27 @@ void opcontrol() {
     }
 
     if ((frontEnable % 2) == 1) {
-      frontstage.move_voltage(12000);
+      intake.move_voltage(12000);
       if (master.get_digital(DIGITAL_R1)) {
-        hooks.move(12000);
+        intake.move_voltage(12000);
       } else {
-        hooks.move_voltage(0);
+        intake.move_voltage(0);
       }
     }
 
     if((frontEnable % 2) == 0) {
       if (master.get_digital(DIGITAL_R1)) {
-        frontstage.move_voltage(12000);
-        hooks.move_voltage(12000);
+        intake.move_voltage(12000);
       } else if (master.get_digital(DIGITAL_R2)) {
-        frontstage.move_voltage(-12000);
-        hooks.move_voltage(-12000);
+        intake.move_voltage(-12000);
       } else {
-        frontstage.move_voltage(0);
-        hooks.move_voltage(0);
+        intake.move_voltage(0);
       }
     }
 
     mogoClamp.button_toggle(master.get_digital(DIGITAL_B));
     lDoinker.button_toggle(master.get_digital(DIGITAL_RIGHT));
     rDoinker.button_toggle(master.get_digital(DIGITAL_Y));
-    
-    if (PIDenable == true) {
-      lbm.move(Lady.compute((lb.get_position())/100.0));
-    }
 
     pros::delay(ez::util::DELAY_TIME);  // This is used for timer calculations!  Keep this ez::util::DELAY_TIME
   }

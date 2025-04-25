@@ -13,50 +13,12 @@
 
 void live_Data() {
   while (true) {
-    std::cout << "Heading: " << chassis.drive_imu_get() << std::endl;
+    //std::cout << "Heading: " << chassis.drive_imu_get() << std::endl;
     std::cout << "Hue: " << colorSensor.get_hue() << std::endl;
-    std::cout << "POS: " << lb.get_position() << std::endl;
+    //std::cout << "POS: " << lb.get_position() << std::endl;
+    //std::cout << "Power: " << hooks.get_power() << std::endl;
     pros::delay(100);
   }
 }
 
-void ringDirect() {
-  intakeToggleControl++;
-  stopIntake();
-  pros::delay(100);
 
-  pros::delay(1000);
-  std::cout << "adkjhafklsjhdflkjsdhf" << std::endl;
-}
-
-void autoRingDirect() {
-  int ringCount = 0;
-  colorSensor.set_led_pwm(100);
-  while (true) {
-    if (colorSensor.get_hue() < 15) {
-      stopIntake();
-      pros::delay(100);
-      
-      ringCount++;
-    }
-  }
-}
-
-void colorSort() {
-  while (true) {
-    //runIntake(12000);
-    if (color == 0) { // blue
-      if (colorSensor.get_hue()) {
-        stopIntake();
-        pros::delay(100);
-      }
-    }
-    if (color == 1) { // red
-      if (colorSensor.get_hue()) { 
-        stopIntake();
-        pros::delay(100);
-      }
-    }
-    pros::delay(20);
-  }
-}
