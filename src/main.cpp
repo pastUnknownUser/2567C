@@ -122,7 +122,7 @@ void autonomous() {
   chassis.odom_xyt_set(0_in, 0_in, 0_deg);    // Set the current position, you can start at a specific position with this
   chassis.drive_brake_set(MOTOR_BRAKE_HOLD);  // Set motors to hold.  This helps autonomous consistency
   pros::Task data(live_Data);
-  lbrd = 116;
+
   //intakeStopper.set_led_pwm(100);
   /*
   Odometry and Pure Pursuit are not magic

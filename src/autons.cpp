@@ -139,6 +139,7 @@ inline void set_lift(int input) {
 void lbr() {
   Lady.exit_condition_set(100, 3, 400, 7, 100, 200);
   lb.reset();
+  Lady.constants_set(3, 0, 4);
   while (true) {
     if (PIDenable == 1) {
       Lady.target_set(lbrd);
@@ -277,12 +278,12 @@ void red_right_rush() {
 void red_right_Simple_Wmiddlering() {
   pros::Task ladybrown(lbr);
   PIDenable = 1;
-  lbrd = 300;
+  lbrd = -65;
   pros::delay(400);
-  rvs(2,127);
-  turn(-43,127);
-  lbrd = 120;
-  rvs(20,127);
+  //rvs(2,127);
+  //turn(-43,127);
+  //lbrd = 120;
+  /*rvs(20,127);
   rvs(18,65);
   mogoClamp.set(true);
   pros::delay(75);
@@ -321,11 +322,12 @@ void red_right_Simple_Wmiddlering() {
   turn(65,127);
   fwrd(15,127);
 
-
+*/
 
 
   
   ladybrown.remove();
+  
 }
 
 void blue_left_Simple_Wmiddlering() {
